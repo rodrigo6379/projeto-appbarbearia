@@ -108,13 +108,13 @@ export default function ServicesView() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Card className="p-5 bg-gradient-to-br from-rose-500 to-rose-600 border-rose-200">
+        <Card className="p-5 bg-gradient-to-br from-electric-500 to-electric-700 border-transparent">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-rose-100 text-sm font-medium">Total faturado no período</p>
+              <p className="text-electric-50 text-sm font-medium">Total faturado no período</p>
               <p className="text-white text-3xl font-bold font-display mt-1">{formatCurrency(totalRevenue)}</p>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center">
               <Calendar className="w-6 h-6 text-white" />
             </div>
           </div>
@@ -123,14 +123,14 @@ export default function ServicesView() {
         <Card className="p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-stone-500 text-sm font-medium">Serviços no período</p>
-              <p className="text-stone-800 text-3xl font-bold font-display mt-1">{services.length}</p>
-              <p className="text-stone-400 text-xs mt-1">
+              <p className="text-slate-400 text-sm font-medium">Serviços no período</p>
+              <p className="text-white text-3xl font-bold font-display mt-1">{services.length}</p>
+              <p className="text-slate-500 text-xs mt-1">
                 {services.filter((s) => s.posted_to_finance).length} lançados no financeiro
               </p>
             </div>
-            <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center">
-              <CheckCircle2 className="w-6 h-6 text-rose-400" />
+            <div className="w-12 h-12 rounded-2xl bg-electric-500/10 flex items-center justify-center">
+              <CheckCircle2 className="w-6 h-6 text-electric-400" />
             </div>
           </div>
         </Card>
@@ -140,27 +140,27 @@ export default function ServicesView() {
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
         <div className="flex flex-1 gap-2 flex-col sm:flex-row">
           <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
               type="text"
               value={filter.clientName}
               onChange={(e) => setFilter((f) => ({ ...f, clientName: e.target.value }))}
               placeholder="Buscar por cliente..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-rose-200 bg-white text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all placeholder:text-stone-300"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all placeholder:text-slate-600"
             />
           </div>
           <input
             type="date"
             value={filter.startDate}
             onChange={(e) => setFilter((f) => ({ ...f, startDate: e.target.value }))}
-            className="px-3 py-2.5 rounded-xl border border-rose-200 bg-white text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all"
+            className="px-3 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all"
           />
-          <span className="hidden sm:flex items-center text-stone-300 text-sm">até</span>
+          <span className="hidden sm:flex items-center text-slate-500 text-sm">até</span>
           <input
             type="date"
             value={filter.endDate}
             onChange={(e) => setFilter((f) => ({ ...f, endDate: e.target.value }))}
-            className="px-3 py-2.5 rounded-xl border border-rose-200 bg-white text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all"
+            className="px-3 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all"
           />
           {hasActiveFilter && (
             <Button variant="ghost" size="md" onClick={() => setFilter({ clientName: '', startDate: '', endDate: '' })} className="shrink-0">
@@ -183,7 +183,7 @@ export default function ServicesView() {
             message={hasActiveFilter ? 'Nenhum serviço encontrado com esses filtros.' : 'Nenhum serviço registrado ainda. Clique em "Novo Serviço" para começar.'}
           />
         ) : (
-          <div className="divide-y divide-rose-50">
+          <div className="divide-y divide-ink-700/60">
             {services.map((service) => (
               <ServiceRow
                 key={service.id}
@@ -221,41 +221,41 @@ function ServiceRow({
   onToggleFinance: () => void
 }) {
   return (
-    <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-rose-50/40 transition-colors animate-fade-in group">
+    <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-ink-800/50 transition-colors animate-fade-in group">
       <button
         onClick={onToggleFinance}
         title={service.posted_to_finance ? 'Lançado no financeiro — clicar para remover' : 'Lançar no financeiro'}
         className="shrink-0 transition-transform hover:scale-110"
       >
         {service.posted_to_finance ? (
-          <CheckCircle2 className="w-5 h-5 text-rose-500" />
+          <CheckCircle2 className="w-5 h-5 text-electric-400" />
         ) : (
-          <Circle className="w-5 h-5 text-stone-200 hover:text-rose-300" />
+          <Circle className="w-5 h-5 text-slate-600 hover:text-electric-400" />
         )}
       </button>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
-          <p className="font-medium text-stone-800 text-sm truncate">{service.client_name}</p>
-          <span className="text-xs text-stone-300">
+          <p className="font-medium text-slate-100 text-sm truncate">{service.client_name}</p>
+          <span className="text-xs text-slate-500">
             {formatDate(service.service_date)} às {formatTime(service.service_time)}
           </span>
         </div>
-        <p className="text-sm text-stone-500 truncate mt-0.5">{service.description}</p>
+        <p className="text-sm text-slate-400 truncate mt-0.5">{service.description}</p>
         {service.posted_to_finance && (
-          <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-medium text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 mt-1 text-[10px] font-medium text-electric-300 bg-electric-500/15 px-2 py-0.5 rounded-full">
             <CheckCircle2 className="w-3 h-3" /> no financeiro
           </span>
         )}
       </div>
 
       <div className="text-right shrink-0">
-        <p className="font-semibold text-stone-800 text-sm font-display">{formatCurrency(Number(service.amount))}</p>
+        <p className="font-semibold text-slate-100 text-sm font-display">{formatCurrency(Number(service.amount))}</p>
       </div>
 
       <button
         onClick={onDelete}
-        className="shrink-0 p-2 text-stone-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+        className="shrink-0 p-2 text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
         title="Excluir"
       >
         <Trash2 className="w-4 h-4" />
@@ -344,14 +344,14 @@ function ServiceForm({ onClose, onSaved }: { onClose: () => void; onSaved: () =>
   }
 
   return (
-    <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md animate-scale-in max-h-[90vh] overflow-y-auto"
+        className="bg-ink-850 rounded-2xl shadow-xl shadow-black/50 w-full max-w-md animate-scale-in max-h-[90vh] overflow-y-auto border border-ink-700"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-rose-50">
-          <h2 className="font-display text-lg font-bold text-stone-800">Registrar Serviço</h2>
-          <button onClick={onClose} className="text-stone-300 hover:text-stone-500 transition-colors">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-ink-700">
+          <h2 className="font-display text-lg font-bold text-white">Registrar Serviço</h2>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -365,16 +365,16 @@ function ServiceForm({ onClose, onSaved }: { onClose: () => void; onSaved: () =>
             <Input label="Horário" type="time" value={time} onChange={setTime} required />
           </div>
 
-          <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-rose-50/50 hover:bg-rose-50 transition-colors">
+          <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl bg-electric-500/5 hover:bg-electric-500/10 transition-colors border border-electric-500/15">
             <input
               type="checkbox"
               checked={postToFinance}
               onChange={(e) => setPostToFinance(e.target.checked)}
-              className="w-5 h-5 rounded accent-rose-500"
+              className="w-5 h-5 rounded accent-electric-500"
             />
             <div>
-              <p className="text-sm font-medium text-stone-700">Lançar no controle financeiro</p>
-              <p className="text-xs text-stone-400">Cria automaticamente uma receita no financeiro</p>
+              <p className="text-sm font-medium text-slate-200">Lançar no controle financeiro</p>
+              <p className="text-xs text-slate-500">Cria automaticamente uma receita no financeiro</p>
             </div>
           </label>
 

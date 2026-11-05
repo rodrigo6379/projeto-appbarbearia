@@ -1,6 +1,6 @@
 export function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-white rounded-2xl shadow-sm shadow-rose-100/50 border border-rose-100/80 ${className}`}>
+    <div className={`bg-ink-850 rounded-2xl shadow-sm shadow-black/40 border border-ink-700 ${className}`}>
       {children}
     </div>
   )
@@ -24,10 +24,10 @@ export function Button({
   disabled?: boolean
 }) {
   const variants = {
-    primary: 'bg-gradient-to-r from-rose-500 to-rose-600 text-white hover:from-rose-600 hover:to-rose-700 shadow-md shadow-rose-200',
-    secondary: 'bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-200',
-    ghost: 'text-stone-500 hover:text-stone-700 hover:bg-stone-100',
-    danger: 'text-red-500 hover:bg-red-50',
+    primary: 'bg-gradient-to-r from-electric-500 to-electric-600 text-white hover:from-electric-400 hover:to-electric-500 shadow-md shadow-electric-500/25',
+    secondary: 'bg-electric-500/10 text-electric-300 hover:bg-electric-500/20 border border-electric-500/30',
+    ghost: 'text-slate-400 hover:text-slate-200 hover:bg-ink-700',
+    danger: 'text-red-400 hover:bg-red-500/10',
   }
   const sizes = {
     sm: 'px-3 py-1.5 text-xs',
@@ -67,7 +67,7 @@ export function Input({
   return (
     <label className="block">
       {label && (
-        <span className="block text-sm font-medium text-stone-600 mb-1.5">{label}</span>
+        <span className="block text-sm font-medium text-slate-300 mb-1.5">{label}</span>
       )}
       <input
         type={type}
@@ -77,7 +77,7 @@ export function Input({
         required={required}
         step={step}
         min={min}
-        className="w-full px-4 py-2.5 rounded-xl border border-rose-200 bg-white text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all placeholder:text-stone-300"
+        className="w-full px-4 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all placeholder:text-slate-600"
       />
     </label>
   )
@@ -97,12 +97,12 @@ export function Select({
   return (
     <label className="block">
       {label && (
-        <span className="block text-sm font-medium text-stone-600 mb-1.5">{label}</span>
+        <span className="block text-sm font-medium text-slate-300 mb-1.5">{label}</span>
       )}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-2.5 rounded-xl border border-rose-200 bg-white text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all cursor-pointer"
+        className="w-full px-4 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all cursor-pointer"
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -117,10 +117,10 @@ export function Select({
 export function EmptyState({ icon, message }: { icon: React.ReactNode; message: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="w-14 h-14 rounded-full bg-rose-50 flex items-center justify-center text-rose-300 mb-3">
+      <div className="w-14 h-14 rounded-full bg-electric-500/10 flex items-center justify-center text-electric-400/60 mb-3">
         {icon}
       </div>
-      <p className="text-sm text-stone-400 max-w-xs">{message}</p>
+      <p className="text-sm text-slate-500 max-w-xs">{message}</p>
     </div>
   )
 }
@@ -128,7 +128,7 @@ export function EmptyState({ icon, message }: { icon: React.ReactNode; message: 
 export function Spinner() {
   return (
     <div className="flex items-center justify-center py-12">
-      <div className="w-8 h-8 border-3 border-rose-200 border-t-rose-500 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-3 border-ink-600 border-t-electric-500 rounded-full animate-spin" />
     </div>
   )
 }
@@ -137,7 +137,9 @@ export function Toast({ message, type, onClose }: { message: string; type: 'succ
   return (
     <div
       className={`fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl shadow-lg animate-slide-up flex items-center gap-3 ${
-        type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+        type === 'success'
+          ? 'bg-electric-500/15 text-electric-200 border border-electric-500/30'
+          : 'bg-red-500/15 text-red-300 border border-red-500/30'
       }`}
     >
       <span className="text-sm font-medium">{message}</span>

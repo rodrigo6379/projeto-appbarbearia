@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
 :root {
   font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.5;
@@ -9,8 +11,8 @@
 
 body {
   margin: 0;
-  background-color: #fdf7f8;
-  color: #1c1917;
+  background-color: #060a12;
+  color: #eef3f8;
 }
 
 * {
@@ -26,9 +28,9 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #fecdd3;
+  background: #1b2735;
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #fda4af;
+  background: #243245;
 }

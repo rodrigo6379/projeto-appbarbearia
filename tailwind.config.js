@@ -4,21 +4,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        rose: {
-          50: '#fff1f2',
-          100: '#ffe4e6',
-          200: '#fecdd3',
-          300: '#fda4af',
-          400: '#fb7185',
-          500: '#f43f5e',
-          600: '#e11d48',
-          700: '#be123c',
-          800: '#9f1239',
-          900: '#881337',
+        ink: {
+          950: '#060a12',
+          900: '#0a1018',
+          850: '#0e1620',
+          800: '#121c28',
+          750: '#16202e',
+          700: '#1b2735',
+          600: '#243245',
+          500: '#314253',
+        },
+        electric: {
+          50: '#eef6ff',
+          100: '#d9ecff',
+          200: '#b4d8ff',
+          300: '#7ec0ff',
+          400: '#3aa3ff',
+          500: '#1685ff',
+          600: '#0a6fd9',
+          700: '#085ab0',
+          800: '#0a4a8c',
+          900: '#0c3d72',
         },
       },
       fontFamily: {
-        display: ['"Playfair Display"', 'serif'],
+        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
       },
       animation: {

@@ -120,14 +120,14 @@ export default function DashboardView() {
               onClick={() => setPeriodKey(opt.value)}
               className={`px-4 py-2 text-sm font-medium rounded-xl border transition-all ${
                 periodKey === opt.value
-                  ? 'border-rose-400 bg-rose-50 text-rose-600'
-                  : 'border-rose-200 bg-white text-stone-400 hover:border-rose-300 hover:text-rose-400'
+                  ? 'border-electric-500 bg-electric-500/15 text-electric-300'
+                  : 'border-ink-600 bg-ink-800 text-slate-400 hover:border-electric-500/40 hover:text-electric-300'
               }`}
             >
               {opt.label}
             </button>
           ))}
-          <span className="text-xs text-stone-400 capitalize flex items-center ml-1">
+          <span className="text-xs text-slate-500 capitalize flex items-center ml-1">
             {currentPeriod.label}
           </span>
         </div>
@@ -147,30 +147,30 @@ export default function DashboardView() {
               value={String(data?.todayAppointments ?? 0)}
               hint={formatDate(todayISO())}
               icon={<CalendarClock className="w-5 h-5 text-white" />}
-              gradient="from-blue-400 to-blue-600"
-              badgeColor="bg-white/20"
+              gradient="from-electric-500 to-electric-700"
+              badgeColor="bg-white/15"
             />
             <IndicatorCard
               label="Serviços concluídos"
               value={String(data?.completedServices ?? 0)}
               hint={periodKey === 'all' ? 'total registrado' : currentPeriod.label}
               icon={<CheckCircle2 className="w-5 h-5 text-white" />}
-              gradient="from-rose-400 to-rose-600"
-              badgeColor="bg-white/20"
+              gradient="from-electric-600 to-electric-800"
+              badgeColor="bg-white/15"
             />
             <IndicatorCard
               label="Receitas do período"
               value={formatCurrency(data?.totalIncome ?? 0)}
               icon={<TrendingUp className="w-5 h-5 text-white" />}
-              gradient="from-green-500 to-emerald-600"
-              badgeColor="bg-white/20"
+              gradient="from-emerald-500 to-emerald-700"
+              badgeColor="bg-white/15"
             />
             <IndicatorCard
               label="Despesas do período"
               value={formatCurrency(data?.totalExpense ?? 0)}
               icon={<TrendingDown className="w-5 h-5 text-white" />}
-              gradient="from-orange-400 to-red-500"
-              badgeColor="bg-white/20"
+              gradient="from-red-500 to-red-700"
+              badgeColor="bg-white/15"
             />
             <IndicatorCard
               label="Saldo atual"
@@ -178,21 +178,21 @@ export default function DashboardView() {
               hint={data && data.balance >= 0 ? 'positivo' : 'negativo'}
               icon={<Wallet className="w-5 h-5 text-white" />}
               gradient={
-                (data?.balance ?? 0) >= 0 ? 'from-rose-500 to-rose-600' : 'from-stone-500 to-stone-700'
+                (data?.balance ?? 0) >= 0 ? 'from-electric-500 to-electric-700' : 'from-slate-600 to-slate-800'
               }
-              badgeColor="bg-white/20"
+              badgeColor="bg-white/15"
             />
           </div>
 
           {/* Summary insight */}
           <Card className="p-5">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center shrink-0">
-                <Wallet className="w-5 h-5 text-rose-400" />
+              <div className="w-10 h-10 rounded-xl bg-electric-500/10 flex items-center justify-center shrink-0">
+                <Wallet className="w-5 h-5 text-electric-400" />
               </div>
               <div className="flex-1">
-                <h3 className="font-display text-base font-bold text-stone-800">Resumo financeiro</h3>
-                <p className="text-sm text-stone-500 mt-1 leading-relaxed">
+                <h3 className="font-display text-base font-bold text-white">Resumo financeiro</h3>
+                <p className="text-sm text-slate-400 mt-1 leading-relaxed">
                   {periodKey === 'today' && 'Visão de hoje: '}
                   {periodKey === 'month' && `${currentPeriod.label}: `}
                   {periodKey === 'all' && 'Todo o histórico: '}
@@ -201,7 +201,7 @@ export default function DashboardView() {
                     : `${data?.completedServices} serviço(s) concluído(s), `}
                   gerando {formatCurrency(data?.totalIncome ?? 0)} em receitas contra{' '}
                   {formatCurrency(data?.totalExpense ?? 0)} em despesas, resultando em saldo de{' '}
-                  <span className={((data?.balance ?? 0) >= 0 ? 'text-green-600' : 'text-orange-600') + ' font-semibold'}>
+                  <span className={((data?.balance ?? 0) >= 0 ? 'text-emerald-400' : 'text-red-400') + ' font-semibold'}>
                     {formatCurrency(data?.balance ?? 0)}
                   </span>
                   .

@@ -76,37 +76,37 @@ export default function FinanceView() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="p-5 bg-gradient-to-br from-green-500 to-emerald-600 border-green-200">
+        <Card className="p-5 bg-gradient-to-br from-emerald-500 to-emerald-700 border-transparent">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-50 text-sm font-medium">Receitas</p>
+              <p className="text-emerald-50 text-sm font-medium">Receitas</p>
               <p className="text-white text-2xl font-bold font-display mt-1">{formatCurrency(totalIncome)}</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
           </div>
         </Card>
 
-        <Card className="p-5 bg-gradient-to-br from-orange-400 to-red-500 border-orange-200">
+        <Card className="p-5 bg-gradient-to-br from-red-500 to-red-700 border-transparent">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-orange-50 text-sm font-medium">Despesas</p>
+              <p className="text-red-50 text-sm font-medium">Despesas</p>
               <p className="text-white text-2xl font-bold font-display mt-1">{formatCurrency(totalExpense)}</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
               <TrendingDown className="w-5 h-5 text-white" />
             </div>
           </div>
         </Card>
 
-        <Card className={`p-5 bg-gradient-to-br ${balance >= 0 ? 'from-rose-500 to-rose-600 border-rose-200' : 'from-stone-600 to-stone-700 border-stone-400'}`}>
+        <Card className={`p-5 bg-gradient-to-br ${balance >= 0 ? 'from-electric-500 to-electric-700' : 'from-slate-600 to-slate-800'} border-transparent`}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-rose-50 text-sm font-medium">Saldo do período</p>
+              <p className="text-electric-50 text-sm font-medium">Saldo do período</p>
               <p className="text-white text-2xl font-bold font-display mt-1">{formatCurrency(balance)}</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
               <Wallet className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -120,14 +120,14 @@ export default function FinanceView() {
             type="date"
             value={filter.startDate}
             onChange={(e) => setFilter((f) => ({ ...f, startDate: e.target.value }))}
-            className="px-3 py-2.5 rounded-xl border border-rose-200 bg-white text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all"
+            className="px-3 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all"
           />
-          <span className="text-stone-300 text-sm">até</span>
+          <span className="text-slate-500 text-sm">até</span>
           <input
             type="date"
             value={filter.endDate}
             onChange={(e) => setFilter((f) => ({ ...f, endDate: e.target.value }))}
-            className="px-3 py-2.5 rounded-xl border border-rose-200 bg-white text-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent transition-all"
+            className="px-3 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all"
           />
           <Button variant="ghost" size="sm" onClick={goToThisMonth} className="shrink-0">
             Este mês
@@ -138,7 +138,7 @@ export default function FinanceView() {
             </Button>
           )}
           {filter.startDate && filter.endDate && (
-            <span className="text-xs text-stone-400 capitalize ml-1">
+            <span className="text-xs text-slate-500 capitalize ml-1">
               {monthLabel(filter.startDate)}
             </span>
           )}
@@ -158,7 +158,7 @@ export default function FinanceView() {
             message={'Nenhum lançamento neste período. Clique em "Novo Lançamento" para adicionar.'}
           />
         ) : (
-          <div className="divide-y divide-rose-50">
+          <div className="divide-y divide-ink-700/60">
             {transactions.map((t) => (
               <TransactionRow key={t.id} transaction={t} onDelete={() => handleDelete(t)} />
             ))}
@@ -185,10 +185,10 @@ function TransactionRow({ transaction, onDelete }: { transaction: Transaction; o
   const isFromService = transaction.source === 'service'
 
   return (
-    <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-rose-50/40 transition-colors animate-fade-in group">
+    <div className="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 hover:bg-ink-800/50 transition-colors animate-fade-in group">
       <div
         className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
-          isIncome ? 'bg-green-50 text-green-500' : 'bg-orange-50 text-orange-500'
+          isIncome ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
         }`}
       >
         {isIncome ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
@@ -196,27 +196,27 @@ function TransactionRow({ transaction, onDelete }: { transaction: Transaction; o
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className="font-medium text-stone-800 text-sm truncate">{transaction.description}</p>
+          <p className="font-medium text-slate-100 text-sm truncate">{transaction.description}</p>
           {isFromService && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full shrink-0">
+            <span className="inline-flex items-center gap-1 text-[10px] font-medium text-electric-300 bg-electric-500/15 px-2 py-0.5 rounded-full shrink-0">
               <Sparkles className="w-3 h-3" /> serviço
             </span>
           )}
         </div>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-xs text-stone-400">{formatDate(transaction.transaction_date)}</span>
-          <span className="text-xs text-stone-300">·</span>
-          <span className="text-xs text-stone-400">{transaction.category}</span>
+          <span className="text-xs text-slate-500">{formatDate(transaction.transaction_date)}</span>
+          <span className="text-xs text-slate-600">·</span>
+          <span className="text-xs text-slate-500">{transaction.category}</span>
         </div>
       </div>
 
-      <div className={`text-right shrink-0 font-semibold text-sm font-display ${isIncome ? 'text-green-600' : 'text-orange-600'}`}>
+      <div className={`text-right shrink-0 font-semibold text-sm font-display ${isIncome ? 'text-emerald-400' : 'text-red-400'}`}>
         {isIncome ? '+' : '-'}{formatCurrency(Math.abs(Number(transaction.amount)))}
       </div>
 
       <button
         onClick={onDelete}
-        className="shrink-0 p-2 text-stone-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+        className="shrink-0 p-2 text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
         title="Excluir"
       >
         <Trash2 className="w-4 h-4" />
@@ -277,14 +277,14 @@ function TransactionForm({ onClose, onSaved }: { onClose: () => void; onSaved: (
   }
 
   return (
-    <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md animate-scale-in max-h-[90vh] overflow-y-auto"
+        className="bg-ink-850 rounded-2xl shadow-xl shadow-black/50 w-full max-w-md animate-scale-in max-h-[90vh] overflow-y-auto border border-ink-700"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-rose-50">
-          <h2 className="font-display text-lg font-bold text-stone-800">Novo Lançamento</h2>
-          <button onClick={onClose} className="text-stone-300 hover:text-stone-500 transition-colors">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-ink-700">
+          <h2 className="font-display text-lg font-bold text-white">Novo Lançamento</h2>
+          <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -297,8 +297,8 @@ function TransactionForm({ onClose, onSaved }: { onClose: () => void; onSaved: (
               onClick={() => setType('income')}
               className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 font-medium text-sm transition-all ${
                 type === 'income'
-                  ? 'border-green-400 bg-green-50 text-green-600'
-                  : 'border-stone-200 bg-white text-stone-400 hover:border-stone-300'
+                  ? 'border-emerald-500 bg-emerald-500/15 text-emerald-400'
+                  : 'border-ink-600 bg-ink-800 text-slate-500 hover:border-ink-500'
               }`}
             >
               <TrendingUp className="w-4 h-4" /> Receita
@@ -308,8 +308,8 @@ function TransactionForm({ onClose, onSaved }: { onClose: () => void; onSaved: (
               onClick={() => setType('expense')}
               className={`flex items-center justify-center gap-2 py-3 rounded-xl border-2 font-medium text-sm transition-all ${
                 type === 'expense'
-                  ? 'border-orange-400 bg-orange-50 text-orange-600'
-                  : 'border-stone-200 bg-white text-stone-400 hover:border-stone-300'
+                  ? 'border-red-500 bg-red-500/15 text-red-400'
+                  : 'border-ink-600 bg-ink-800 text-slate-500 hover:border-ink-500'
               }`}
             >
               <TrendingDown className="w-4 h-4" /> Despesa
