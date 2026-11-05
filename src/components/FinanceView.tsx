@@ -1,16 +1,21 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, X, ArrowUpRight, ArrowDownRight, Sparkles } from 'lucide-react'
+import { Plus, Trash2, TrendingUp, TrendingDown, Wallet, X, ArrowUpRight, ArrowDownRight, Sparkles, AlertCircle } from 'lucide-react'
 import { supabase, type Transaction } from '../lib/supabase'
 import { formatCurrency, formatDate, todayISO, getMonthRange, monthLabel } from '../lib/format'
 import { useToast } from '../lib/useToast'
-import { Card, Button, Input, Select, EmptyState, Spinner, Toast } from './ui'
+import { Card, Button, Input, Select, EmptyState, Spinner, Toast, ConfirmDialog } from './ui'
 
 type Filter = { startDate: string; endDate: string }
+
+const MAX_AMOUNT = 9999999.99
 
 export default function FinanceView() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Transaction | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const [filter, setFilter] = useState<Filter>(() => {
     const range = getMonthRange(todayISO())
     return { startDate: range.start, endDate: range.end }
@@ -19,6 +24,7 @@ export default function FinanceView() {
 
   const fetchTransactions = useCallback(async () => {
     setLoading(true)
+    setLoadError(false)
     let query = supabase.from('transactions').select('*').order('transaction_date', { ascending: false }).order('created_at', { ascending: false })
 
     if (filter.startDate) {
@@ -30,7 +36,9 @@ export default function FinanceView() {
 
     const { data, error } = await query
     if (error) {
-      showToast('Erro ao carregar transações', 'error')
+      console.error('fetchTransactions error', error)
+      setLoadError(true)
+      showToast('Não foi possível carregar os lançamentos. Tente novamente.', 'error')
     } else {
       setTransactions(data || [])
     }
@@ -45,23 +53,30 @@ export default function FinanceView() {
   const totalExpense = transactions.filter((t) => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0)
   const balance = totalIncome - totalExpense
 
-  const handleDelete = async (t: Transaction) => {
-    if (t.source === 'service') {
-      if (!confirm('Este lançamento veio de um serviço. Remover do financeiro também desmarcará o serviço. Continuar?')) return
-      if (t.service_id) {
-        await supabase.from('services').update({ posted_to_finance: false, transaction_id: null }).eq('id', t.service_id)
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    setDeleting(true)
+
+    if (deleteTarget.source === 'service' && deleteTarget.service_id) {
+      const { error: updErr } = await supabase
+        .from('services')
+        .update({ posted_to_finance: false, transaction_id: null })
+        .eq('id', deleteTarget.service_id)
+      if (updErr) {
+        console.error('unlink service error', updErr)
       }
-    } else {
-      if (!confirm('Excluir este lançamento?')) return
     }
 
-    const { error } = await supabase.from('transactions').delete().eq('id', t.id)
+    const { error } = await supabase.from('transactions').delete().eq('id', deleteTarget.id)
     if (error) {
-      showToast('Erro ao excluir lançamento', 'error')
+      console.error('delete transaction error', error)
+      showToast('Erro ao excluir lançamento. Tente novamente.', 'error')
     } else {
       showToast('Lançamento excluído')
       fetchTransactions()
     }
+    setDeleting(false)
+    setDeleteTarget(null)
   }
 
   const goToThisMonth = () => {
@@ -78,11 +93,11 @@ export default function FinanceView() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="p-5 bg-gradient-to-br from-emerald-500 to-emerald-700 border-transparent">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0">
               <p className="text-emerald-50 text-sm font-medium">Receitas</p>
-              <p className="text-white text-2xl font-bold font-display mt-1">{formatCurrency(totalIncome)}</p>
+              <p className="text-white text-2xl font-bold font-display mt-1 truncate">{formatCurrency(totalIncome)}</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -90,11 +105,11 @@ export default function FinanceView() {
 
         <Card className="p-5 bg-gradient-to-br from-red-500 to-red-700 border-transparent">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0">
               <p className="text-red-50 text-sm font-medium">Despesas</p>
-              <p className="text-white text-2xl font-bold font-display mt-1">{formatCurrency(totalExpense)}</p>
+              <p className="text-white text-2xl font-bold font-display mt-1 truncate">{formatCurrency(totalExpense)}</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
               <TrendingDown className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -102,11 +117,11 @@ export default function FinanceView() {
 
         <Card className={`p-5 bg-gradient-to-br ${balance >= 0 ? 'from-electric-500 to-electric-700' : 'from-slate-600 to-slate-800'} border-transparent`}>
           <div className="flex items-center justify-between">
-            <div>
+            <div className="min-w-0">
               <p className="text-electric-50 text-sm font-medium">Saldo do período</p>
-              <p className="text-white text-2xl font-bold font-display mt-1">{formatCurrency(balance)}</p>
+              <p className="text-white text-2xl font-bold font-display mt-1 truncate">{formatCurrency(balance)}</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
               <Wallet className="w-5 h-5 text-white" />
             </div>
           </div>
@@ -119,6 +134,7 @@ export default function FinanceView() {
           <input
             type="date"
             value={filter.startDate}
+            max={filter.endDate || undefined}
             onChange={(e) => setFilter((f) => ({ ...f, startDate: e.target.value }))}
             className="px-3 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all"
           />
@@ -126,6 +142,7 @@ export default function FinanceView() {
           <input
             type="date"
             value={filter.endDate}
+            min={filter.startDate || undefined}
             onChange={(e) => setFilter((f) => ({ ...f, endDate: e.target.value }))}
             className="px-3 py-2.5 rounded-xl border border-ink-600 bg-ink-800 text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-electric-500/50 focus:border-electric-500 transition-all"
           />
@@ -152,6 +169,14 @@ export default function FinanceView() {
       <Card className="overflow-hidden">
         {loading ? (
           <Spinner />
+        ) : loadError ? (
+          <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+            <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center text-red-400/60 mb-3">
+              <AlertCircle className="w-7 h-7" />
+            </div>
+            <p className="text-sm text-slate-400 max-w-xs mb-4">Falha ao carregar os lançamentos.</p>
+            <Button variant="secondary" size="sm" onClick={fetchTransactions}>Tentar novamente</Button>
+          </div>
         ) : transactions.length === 0 ? (
           <EmptyState
             icon={<Wallet className="w-7 h-7" />}
@@ -160,7 +185,7 @@ export default function FinanceView() {
         ) : (
           <div className="divide-y divide-ink-700/60">
             {transactions.map((t) => (
-              <TransactionRow key={t.id} transaction={t} onDelete={() => handleDelete(t)} />
+              <TransactionRow key={t.id} transaction={t} onDelete={() => setDeleteTarget(t)} />
             ))}
           </div>
         )}
@@ -172,10 +197,22 @@ export default function FinanceView() {
           onSaved={() => {
             setShowForm(false)
             fetchTransactions()
-            showToast('Lançamento criado!')
+            showToast('Lançamento criado com sucesso!')
           }}
         />
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Excluir lançamento"
+        message={
+          deleteTarget?.source === 'service'
+            ? 'Este lançamento veio de um serviço. Removê-lo do financeiro também desmarcará o serviço como lançado. Deseja continuar?'
+            : 'Tem certeza que deseja excluir este lançamento? Esta ação não pode ser desfeita.'
+        }
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   )
 }
@@ -206,7 +243,7 @@ function TransactionRow({ transaction, onDelete }: { transaction: Transaction; o
         <div className="flex items-center gap-2 mt-0.5">
           <span className="text-xs text-slate-500">{formatDate(transaction.transaction_date)}</span>
           <span className="text-xs text-slate-600">·</span>
-          <span className="text-xs text-slate-500">{transaction.category}</span>
+          <span className="text-xs text-slate-500 capitalize">{transaction.category}</span>
         </div>
       </div>
 
@@ -216,7 +253,7 @@ function TransactionRow({ transaction, onDelete }: { transaction: Transaction; o
 
       <button
         onClick={onDelete}
-        className="shrink-0 p-2 text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+        className="shrink-0 p-2 text-slate-600 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all sm:opacity-0 sm:group-hover:opacity-100"
         title="Excluir"
       >
         <Trash2 className="w-4 h-4" />
@@ -232,6 +269,8 @@ function TransactionForm({ onClose, onSaved }: { onClose: () => void; onSaved: (
   const [category, setCategory] = useState('geral')
   const [date, setDate] = useState(todayISO())
   const [saving, setSaving] = useState(false)
+  const [errors, setErrors] = useState<{ description?: string; amount?: string; date?: string }>({})
+  const { showToast } = useToast()
 
   const categoryOptions = [
     { value: 'geral', label: 'Geral' },
@@ -244,17 +283,44 @@ function TransactionForm({ onClose, onSaved }: { onClose: () => void; onSaved: (
     { value: 'outros', label: 'Outros' },
   ]
 
+  const validate = () => {
+    const errs: typeof errors = {}
+    if (!description.trim()) {
+      errs.description = 'Informe uma descrição.'
+    } else if (description.trim().length < 3) {
+      errs.description = 'A descrição deve ter ao menos 3 caracteres.'
+    }
+
+    const amountNum = parseFloat(amount)
+    if (!amount || isNaN(amountNum)) {
+      errs.amount = 'Informe um valor válido.'
+    } else if (amountNum <= 0) {
+      errs.amount = 'O valor deve ser maior que zero.'
+    } else if (amountNum > MAX_AMOUNT) {
+      errs.amount = 'O valor é muito alto.'
+    }
+
+    if (!date) {
+      errs.date = 'Selecione uma data.'
+    } else {
+      const selected = new Date(date + 'T00:00:00')
+      const now = new Date()
+      const maxFuture = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate())
+      if (selected > maxFuture) {
+        errs.date = 'A data não pode ser muito no futuro.'
+      }
+    }
+
+    setErrors(errs)
+    return Object.keys(errs).length === 0
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!description.trim() || !amount || !date) return
+    if (!validate()) return
 
     setSaving(true)
     const amountNum = parseFloat(amount)
-    if (isNaN(amountNum) || amountNum <= 0) {
-      setSaving(false)
-      return
-    }
-
     const signedAmount = type === 'income' ? amountNum : -amountNum
 
     const { error } = await supabase.from('transactions').insert({
@@ -267,8 +333,9 @@ function TransactionForm({ onClose, onSaved }: { onClose: () => void; onSaved: (
     })
 
     if (error) {
+      console.error('insert transaction error', error)
+      showToast('Erro ao salvar lançamento. Tente novamente.', 'error')
       setSaving(false)
-      alert('Erro ao salvar lançamento')
       return
     }
 
@@ -282,7 +349,7 @@ function TransactionForm({ onClose, onSaved }: { onClose: () => void; onSaved: (
         className="bg-ink-850 rounded-2xl shadow-xl shadow-black/50 w-full max-w-md animate-scale-in max-h-[90vh] overflow-y-auto border border-ink-700"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-ink-700">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-ink-700 sticky top-0 bg-ink-850 z-10">
           <h2 className="font-display text-lg font-bold text-white">Novo Lançamento</h2>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
             <X className="w-5 h-5" />
@@ -316,11 +383,11 @@ function TransactionForm({ onClose, onSaved }: { onClose: () => void; onSaved: (
             </button>
           </div>
 
-          <Input label="Descrição" value={description} onChange={setDescription} placeholder="Ex: Compra de produtos" required />
-          <Input label="Valor (R$)" type="number" step="0.01" min="0" value={amount} onChange={setAmount} placeholder="0,00" required />
+          <Input label="Descrição" value={description} onChange={setDescription} placeholder="Ex: Compra de produtos" required error={errors.description} />
+          <Input label="Valor (R$)" type="number" step="0.01" min="0" max={String(MAX_AMOUNT)} value={amount} onChange={setAmount} placeholder="0,00" required error={errors.amount} />
           <div className="grid grid-cols-2 gap-3">
             <Select label="Categoria" value={category} onChange={setCategory} options={categoryOptions} />
-            <Input label="Data" type="date" value={date} onChange={setDate} required />
+            <Input label="Data" type="date" value={date} onChange={setDate} required error={errors.date} />
           </div>
 
           <div className="flex gap-3 pt-2">
