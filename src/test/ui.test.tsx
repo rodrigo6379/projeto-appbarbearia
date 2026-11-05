@@ -161,9 +161,9 @@ describe('ConfirmDialog', () => {
   it('chama onConfirm ao clicar no botão de confirmação', () => {
     const onConfirm = vi.fn()
     render(
-      <ConfirmDialog open={true} title="Excluir" message="Confirma?" onConfirm={onConfirm} onCancel={() => {}} />
+      <ConfirmDialog open={true} title="Confirmar exclusão" message="Confirma?" onConfirm={onConfirm} onCancel={() => {}} />
     )
-    fireEvent.click(screen.getByText('Excluir'))
+    fireEvent.click(screen.getByRole('button', { name: 'Excluir' }))
     expect(onConfirm).toHaveBeenCalledTimes(1)
   })
 
@@ -188,8 +188,8 @@ describe('ConfirmDialog', () => {
 
   it('usa label de confirmação personalizado', () => {
     render(
-      <ConfirmDialog open={true} title="Remover" message="Confirma?" confirmLabel="Remover" onConfirm={() => {}} onCancel={() => {}} />
+      <ConfirmDialog open={true} title="Título do diálogo" message="Confirma?" confirmLabel="Remover" onConfirm={() => {}} onCancel={() => {}} />
     )
-    expect(screen.getByText('Remover')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Remover' })).toBeInTheDocument()
   })
 })

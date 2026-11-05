@@ -1,42 +1,35 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 
-const mockResult = { data: null, error: null }
-const mockInsert = vi.fn(() => ({ ...mockQuery, select: vi.fn(() => ({ single: vi.fn(() => Promise.resolve(mockResult)) })) }))
+const { supabase, setMockTables } = vi.hoisted(() => {
+  let mockTables: Record<string, { data?: unknown[]; error?: unknown }> = {}
 
-let mockQuery: any
+  function createMockQuery(table: string) {
+    const entry = () => mockTables[table] ?? { data: [], error: null }
 
-function setupMock(tables: Record<string, { data?: unknown[]; error?: unknown }>) {
-  mockQuery = {
-    select: vi.fn(() => mockQuery),
-    insert: vi.fn(() => mockQuery),
-    update: vi.fn(() => mockQuery),
-    delete: vi.fn(() => mockQuery),
-    eq: vi.fn(() => mockQuery),
-    order: vi.fn(() => mockQuery),
-    gte: vi.fn(() => mockQuery),
-    lte: vi.fn(() => mockQuery),
-    ilike: vi.fn(() => mockQuery),
-    single: vi.fn(() => mockQuery),
-    maybeSingle: vi.fn(() => mockQuery),
-    then: vi.fn((resolve: (v: unknown) => unknown) => {
-      const table = vi.mocked(supabase.from).mock.calls.at(-1)?.[0] ?? ''
-      const entry = tables[table] ?? { data: [], error: null }
-      return Promise.resolve(entry).then(resolve)
-    }),
-    catch: vi.fn(),
+    const chain: Record<string, ReturnType<typeof vi.fn>> = {}
+    const methods = ['select', 'insert', 'update', 'delete', 'eq', 'order', 'gte', 'lte', 'ilike']
+    for (const m of methods) {
+      chain[m] = vi.fn(() => chain)
+    }
+    chain.single = vi.fn(() => Promise.resolve(entry()))
+    chain.maybeSingle = vi.fn(() => Promise.resolve(entry()))
+    chain.then = vi.fn((resolve: (v: unknown) => unknown) => Promise.resolve(entry()).then(resolve))
+    chain.catch = vi.fn()
+    return chain
   }
 
-  const supabase = { from: vi.fn(() => mockQuery) }
-  return supabase
-}
+  const supabase = { from: vi.fn((table: string) => createMockQuery(table)) }
 
-let supabase: ReturnType<typeof setupMock>
+  return {
+    supabase,
+    setMockTables: (tables: Record<string, { data?: unknown[]; error?: unknown }>) => {
+      mockTables = tables
+    },
+  }
+})
 
-vi.mock('../lib/supabase', () => ({
-  get supabase() { return supabase },
-}))
+vi.mock('../lib/supabase', () => ({ supabase }))
 
 import FinanceView from '../components/FinanceView'
 import ServicesView from '../components/ServicesView'
@@ -44,10 +37,11 @@ import ServicesView from '../components/ServicesView'
 describe('Integração: FinanceView com dados', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    setMockTables({})
   })
 
   it('exibe transações retornadas pelo banco na lista', async () => {
-    supabase = setupMock({
+    setMockTables({
       transactions: {
         data: [
           { id: '1', description: 'Venda de produto', amount: 150, type: 'income', category: 'produto', transaction_date: '2026-11-05', source: 'manual', service_id: null, created_at: '2026-11-05' },
@@ -66,7 +60,7 @@ describe('Integração: FinanceView com dados', () => {
   })
 
   it('calcula totais de receitas e despesas corretamente', async () => {
-    supabase = setupMock({
+    setMockTables({
       transactions: {
         data: [
           { id: '1', description: 'Receita A', amount: 200, type: 'income', category: 'geral', transaction_date: '2026-11-05', source: 'manual', service_id: null, created_at: '' },
@@ -80,13 +74,15 @@ describe('Integração: FinanceView com dados', () => {
     render(<FinanceView />)
 
     await waitFor(() => {
-      expect(screen.getByText('R$ 300,00')).toBeInTheDocument()
-      expect(screen.getByText('R$ 50,00')).toBeInTheDocument()
+      // Despesas card shows formatCurrency(-50) = "-R$ 50,00" (with non-breaking space)
+      const allText = document.body.textContent ?? ''
+      expect(allText).toContain('R$\u00a0300,00')
+      expect(allText).toContain('-R$\u00a050,00')
     })
   })
 
   it('exibe estado de erro quando o banco retorna erro', async () => {
-    supabase = setupMock({
+    setMockTables({
       transactions: { data: null, error: { message: 'Database error', code: '42501' } },
     })
 
@@ -102,10 +98,11 @@ describe('Integração: FinanceView com dados', () => {
 describe('Integração: ServicesView com dados', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    setMockTables({})
   })
 
   it('exibe serviços retornados pelo banco na lista', async () => {
-    supabase = setupMock({
+    setMockTables({
       services: {
         data: [
           { id: '1', client_name: 'João Silva', description: 'Corte + Barba', amount: 60, service_date: '2026-11-05', service_time: '14:30', posted_to_finance: true, transaction_id: 't1', created_at: '' },
@@ -126,7 +123,7 @@ describe('Integração: ServicesView com dados', () => {
   })
 
   it('calcula total faturado corretamente', async () => {
-    supabase = setupMock({
+    setMockTables({
       services: {
         data: [
           { id: '1', client_name: 'A', description: 'Serviço A', amount: 100, service_date: '2026-11-05', service_time: '10:00', posted_to_finance: false, transaction_id: null, created_at: '' },
@@ -144,7 +141,7 @@ describe('Integração: ServicesView com dados', () => {
   })
 
   it('exibe estado de erro quando o banco retorna erro', async () => {
-    supabase = setupMock({
+    setMockTables({
       services: { data: null, error: { message: 'Database error', code: '42501' } },
     })
 
@@ -159,20 +156,17 @@ describe('Integração: ServicesView com dados', () => {
 describe('Integração: Validação de formulário FinanceView', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    supabase = setupMock({ transactions: { data: [], error: null } })
+    setMockTables({ transactions: { data: [], error: null } })
   })
 
-  it('não envia formulário com campos vazios', async () => {
-    const user = userEvent.setup()
+  it('não envia formulário com campos vazios e exibe mensagens de erro', async () => {
     render(<FinanceView />)
 
     fireEvent.click(screen.getByText('Novo Lançamento'))
 
-    await waitFor(() => {
-      expect(screen.getByText('Salvar')).toBeInTheDocument()
-    })
-
-    fireEvent.click(screen.getByText('Salvar'))
+    const saveButton = await screen.findByText('Salvar')
+    const form = saveButton.closest('form')!
+    fireEvent.submit(form)
 
     await waitFor(() => {
       expect(screen.getByText('Informe uma descrição.')).toBeInTheDocument()

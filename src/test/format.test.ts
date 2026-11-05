@@ -11,19 +11,19 @@ import {
 
 describe('formatCurrency', () => {
   it('formata zero como moeda brasileira', () => {
-    expect(formatCurrency(0)).toBe('R$ 0,00')
+    expect(formatCurrency(0)).toBe('R$\u00a00,00')
   })
 
   it('formata valor positivo', () => {
-    expect(formatCurrency(1500.5)).toBe('R$ 1.500,50')
+    expect(formatCurrency(1500.5)).toBe('R$\u00a01.500,50')
   })
 
   it('formata valor negativo', () => {
-    expect(formatCurrency(-200)).toBe('-R$ 200,00')
+    expect(formatCurrency(-200)).toBe('-R$\u00a0200,00')
   })
 
   it('formata números grandes com separador de milhar', () => {
-    expect(formatCurrency(1234567.89)).toBe('R$ 1.234.567,89')
+    expect(formatCurrency(1234567.89)).toBe('R$\u00a01.234.567,89')
   })
 })
 
