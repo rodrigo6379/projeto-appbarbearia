@@ -79,11 +79,7 @@ export default function ServicesView() {
     setDeleteTarget(null)
   }
 
-  const handleToggleFinance = async () => {
-    if (!toggleTarget) return
-    const service = toggleTarget
-    setToggleTarget(null)
-
+  const handleToggleFinance = async (service: Service) => {
     if (service.posted_to_finance) {
       if (service.transaction_id) {
         const { error: txnErr } = await supabase.from('transactions').delete().eq('id', service.transaction_id)
@@ -146,6 +142,14 @@ export default function ServicesView() {
       }
     }
     fetchServices()
+  }
+
+  const handleToggleConfirm = () => {
+    if (toggleTarget) {
+      const svc = toggleTarget
+      setToggleTarget(null)
+      handleToggleFinance(svc)
+    }
   }
 
   const hasActiveFilter = filter.clientName || filter.startDate || filter.endDate
@@ -253,8 +257,7 @@ export default function ServicesView() {
                   if (service.posted_to_finance) {
                     setToggleTarget(service)
                   } else {
-                    handleToggleFinance()
-                    setToggleTarget(service)
+                    handleToggleFinance(service)
                   }
                 }}
               />
@@ -288,7 +291,7 @@ export default function ServicesView() {
         title="Remover do financeiro"
         message="Remover este serviço do controle financeiro? O lançamento de receita será excluído."
         confirmLabel="Remover"
-        onConfirm={handleToggleFinance}
+        onConfirm={handleToggleConfirm}
         onCancel={() => setToggleTarget(null)}
       />
     </div>

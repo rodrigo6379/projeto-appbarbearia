@@ -6,6 +6,7 @@ import {
   TrendingDown,
   Wallet,
   RefreshCw,
+  AlertCircle,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { formatCurrency, formatDate, todayISO, getMonthRange, monthLabel } from '../lib/format'
@@ -30,6 +31,7 @@ const periodOptions: { value: 'today' | 'month' | 'all'; label: string }[] = [
 export default function DashboardView() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
   const [periodKey, setPeriodKey] = useState<'today' | 'month' | 'all'>('month')
 
   const currentPeriod: Period = (() => {
@@ -46,6 +48,7 @@ export default function DashboardView() {
 
   const fetchDashboard = useCallback(async () => {
     setLoading(true)
+    setLoadError(false)
 
     const today = todayISO()
 
@@ -56,6 +59,8 @@ export default function DashboardView() {
     ])
 
     if (apptRes.error || svcRes.error || txnRes.error) {
+      console.error('dashboard fetch error', apptRes.error, svcRes.error, txnRes.error)
+      setLoadError(true)
       setLoading(false)
       return
     }
@@ -113,7 +118,7 @@ export default function DashboardView() {
     <div className="space-y-6">
       {/* Period selector */}
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
           {periodOptions.map((opt) => (
             <button
               key={opt.value}
@@ -127,17 +132,25 @@ export default function DashboardView() {
               {opt.label}
             </button>
           ))}
-          <span className="text-xs text-slate-500 capitalize flex items-center ml-1">
+          <span className="text-xs text-slate-500 capitalize ml-1 hidden sm:inline">
             {currentPeriod.label}
           </span>
         </div>
-        <Button variant="ghost" size="sm" onClick={fetchDashboard} className="shrink-0">
+        <Button variant="ghost" size="sm" onClick={fetchDashboard} className="shrink-0 self-start sm:self-auto">
           <RefreshCw className="w-4 h-4" /> Atualizar
         </Button>
       </div>
 
       {loading ? (
         <Spinner />
+      ) : loadError ? (
+        <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+          <div className="w-14 h-14 rounded-full bg-red-500/10 flex items-center justify-center text-red-400/60 mb-3">
+            <AlertCircle className="w-7 h-7" />
+          </div>
+          <p className="text-sm text-slate-400 max-w-xs mb-4">Falha ao carregar os indicadores.</p>
+          <Button variant="secondary" size="sm" onClick={fetchDashboard}>Tentar novamente</Button>
+        </div>
       ) : (
         <>
           {/* Indicator cards */}
@@ -232,10 +245,10 @@ function IndicatorCard({
 }) {
   return (
     <Card className={`p-5 bg-gradient-to-br ${gradient} border-transparent`}>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="text-white/80 text-sm font-medium">{label}</p>
-          <p className="text-white text-2xl font-bold font-display mt-1 truncate">{value}</p>
+          <p className="text-white text-xl sm:text-2xl font-bold font-display mt-1 truncate">{value}</p>
           {hint && <p className="text-white/60 text-xs mt-1 capitalize">{hint}</p>}
         </div>
         <div className={`w-11 h-11 rounded-2xl ${badgeColor} flex items-center justify-center shrink-0`}>
