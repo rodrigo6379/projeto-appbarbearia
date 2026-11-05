@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { Scissors, Wallet, Calendar } from 'lucide-react'
+import { Scissors, Wallet, Calendar, LayoutDashboard } from 'lucide-react'
 import ServicesView from './components/ServicesView'
 import FinanceView from './components/FinanceView'
+import DashboardView from './components/DashboardView'
 
-type Tab = 'services' | 'finance'
+type Tab = 'dashboard' | 'services' | 'finance'
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>('services')
+  const [tab, setTab] = useState<Tab>('dashboard')
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-rose-50 via-white to-rose-50/30">
@@ -32,6 +33,12 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <nav className="flex gap-1 pb-px">
             <TabButton
+              active={tab === 'dashboard'}
+              onClick={() => setTab('dashboard')}
+              icon={<LayoutDashboard className="w-4 h-4" />}
+              label="Painel"
+            />
+            <TabButton
               active={tab === 'services'}
               onClick={() => setTab('services')}
               icon={<Calendar className="w-4 h-4" />}
@@ -49,7 +56,13 @@ export default function App() {
 
       {/* Content */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 animate-fade-in">
-        {tab === 'services' ? <ServicesView /> : <FinanceView />}
+        {tab === 'dashboard' ? (
+          <DashboardView />
+        ) : tab === 'services' ? (
+          <ServicesView />
+        ) : (
+          <FinanceView />
+        )}
       </main>
 
       <footer className="max-w-6xl mx-auto px-4 sm:px-6 py-8 text-center">
