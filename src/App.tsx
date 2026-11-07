@@ -10,7 +10,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('dashboard')
 
   return (
-    <div className="min-h-screen bg-ink-950 bg-[radial-gradient(ellipse_at_top,_#0d1828_0%,_#060a12_55%)]">
+    <div className="min-h-screen bg-ink-950 bg-[ranpm run test:coveragedial-gradient(ellipse_at_top,_#0d1828_0%,_#060a12_55%)]">
       {/* Header */}
       <header className="sticky top-0 z-30 backdrop-blur-md bg-ink-950/80 border-b border-ink-700">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
