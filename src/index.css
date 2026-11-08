@@ -34,3 +34,148 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #243245;
 }
+
+/* ===== Acessibilidade: tamanhos de fonte ===== */
+.a11y-font-normal {
+  font-size: 16px;
+}
+.a11y-font-large {
+  font-size: 18px;
+}
+.a11y-font-xlarge {
+  font-size: 20px;
+}
+
+/* ===== Acessibilidade: alto contraste ===== */
+.a11y-contrast {
+  --a11y-bg: #000000;
+  --a11y-surface: #03080f;
+  --a11y-border: #ffffff;
+  --a11y-text: #ffffff;
+  --a11y-text-muted: #ffffff;
+  --a11y-accent: #00b4ff;
+  --a11y-accent-text: #ffffff;
+}
+
+.a11y-contrast body {
+  background-color: var(--a11y-bg) !important;
+  color: var(--a11y-text) !important;
+}
+
+.a11y-contrast .bg-ink-950,
+.a11y-contrast .bg-ink-900,
+.a11y-contrast .bg-ink-850,
+.a11y-contrast .bg-ink-800,
+.a11y-contrast .bg-ink-750,
+.a11y-contrast .bg-ink-700 {
+  background-color: var(--a11y-surface) !important;
+}
+
+.a11y-contrast .border-ink-700,
+.a11y-contrast .border-ink-600,
+.a11y-contrast .border-ink-500 {
+  border-color: var(--a11y-border) !important;
+}
+
+.a11y-contrast .text-slate-400,
+.a11y-contrast .text-slate-500,
+.a11y-contrast .text-slate-600 {
+  color: var(--a11y-text-muted) !important;
+}
+
+.a11y-contrast .text-electric-300,
+.a11y-contrast .text-electric-400 {
+  color: var(--a11y-accent) !important;
+}
+
+.a11y-contrast .bg-electric-500\/10,
+.a11y-contrast .bg-electric-500\/15,
+.a11y-contrast .bg-electric-500\/20 {
+  background-color: rgba(0, 180, 255, 0.25) !important;
+}
+
+.a11y-contrast .border-electric-500\/30,
+.a11y-contrast .border-electric-500\/40,
+.a11y-contrast .border-electric-500 {
+  border-color: var(--a11y-accent) !important;
+}
+
+.a11y-contrast .bg-gradient-to-r.from-electric-500,
+.a11y-contrast .bg-gradient-to-br.from-electric-500,
+.a11y-contrast .bg-gradient-to-r.from-electric-600,
+.a11y-contrast .bg-gradient-to-br.from-electric-600 {
+  background-image: none !important;
+  background-color: var(--a11y-accent) !important;
+}
+
+.a11y-contrast .bg-red-500\/10,
+.a11y-contrast .bg-red-500\/15,
+.a11y-contrast .bg-red-500\/20 {
+  background-color: rgba(255, 80, 80, 0.3) !important;
+}
+
+.a11y-contrast .bg-gradient-to-r.from-red-500,
+.a11y-contrast .bg-gradient-to-br.from-red-500,
+.a11y-contrast .bg-gradient-to-r.from-red-600,
+.a11y-contrast .bg-gradient-to-br.from-red-600 {
+  background-image: none !important;
+  background-color: #ff3333 !important;
+}
+
+.a11y-contrast .text-red-400,
+.a11y-contrast .text-red-300 {
+  color: #ff6666 !important;
+}
+
+.a11y-contrast .text-emerald-400,
+.a11y-contrast .text-emerald-300 {
+  color: #33ff99 !important;
+}
+
+.a11y-contrast .bg-emerald-500\/10,
+.a11y-contrast .bg-emerald-500\/15 {
+  background-color: rgba(51, 255, 153, 0.25) !important;
+}
+
+.a11y-contrast .bg-gradient-to-br.from-emerald-500,
+.a11y-contrast .bg-gradient-to-r.from-emerald-500,
+.a11y-contrast .bg-gradient-to-br.from-emerald-700,
+.a11y-contrast .bg-gradient-to-r.from-emerald-700 {
+  background-image: none !important;
+  background-color: #00cc66 !important;
+}
+
+.a11y-contrast .backdrop-blur-md {
+  backdrop-filter: none !important;
+}
+
+.a11y-contrast .shadow-sm,
+.a11y-contrast .shadow-md,
+.a11y-contrast .shadow-lg,
+.a11y-contrast .shadow-xl {
+  box-shadow: 0 0 0 1px var(--a11y-border) !important;
+}
+
+.a11y-contrast input,
+.a11y-contrast select,
+.a11y-contrast textarea {
+  background-color: var(--a11y-surface) !important;
+  color: var(--a11y-text) !important;
+  border-color: var(--a11y-border) !important;
+}
+
+.a11y-contrast button:focus-visible,
+.a11y-contrast input:focus-visible,
+.a11y-contrast select:focus-visible {
+  outline: 3px solid var(--a11y-accent) !important;
+  outline-offset: 2px !important;
+}
+
+/* Indicador visual de foco para navegação por teclado (sempre ativo) */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid #3aa3ff;
+  outline-offset: 2px;
+}
